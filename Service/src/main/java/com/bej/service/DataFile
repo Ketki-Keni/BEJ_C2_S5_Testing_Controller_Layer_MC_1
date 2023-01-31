@@ -1,0 +1,40 @@
+=================
+Adding a track
+=================
+Uri : http://localhost:8082/api/v1/track : Method : Post
+{
+    "trackId": 101,
+    "trackName": "Bones",
+    "trackComments": "Genre: Rock Album: Mercury – Acts 1 & 2",
+    "trackRating": 5,
+    "trackArtist": "Imagine Dragons"
+}
+{
+    "trackId": 102,
+    "trackName": "Paradise",
+    "trackComments": "Album: Mylo Xyloto",
+    "trackRating": 4,
+    "trackArtist": "Coldplay"
+}
+{
+    "trackId": 103,
+    "trackName": "Baby",
+    "trackComments": "Debut song",
+    "trackRating": 5,
+    "trackArtist": "Justin Bieber"
+}
+===================
+Deleting a track
+===================
+//Uri : http://localhost:8082/api/v1/track/102 : Method : Delete
+
+=======================
+Getting all the tracks
+=======================
+//Uri : http://localhost:8082/api/v1/tracks : Method : Get
+
+========================
+Getting track by Artist
+========================
+//Uri : http://localhost:8082/api/v1/trackbyartist/Justin Bieber : Method : Get
+
