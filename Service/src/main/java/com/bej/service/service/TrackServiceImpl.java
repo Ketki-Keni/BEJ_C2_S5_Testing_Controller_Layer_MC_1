@@ -7,6 +7,10 @@
 package com.bej.service.service;
 
 import com.bej.service.domain.Track;
+import com.bej.service.exception.TrackAlreadyExistsException;
+import com.bej.service.exception.TrackArtistNotFoundException;
+import com.bej.service.exception.TrackNotFoundException;
+import com.bej.service.exception.TrackRatingNotFoundException;
 import com.bej.service.repository.TrackRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,18 +27,26 @@ public class TrackServiceImpl implements TrackService{
     }
 
     @Override
-    public Track saveTrack(Track track) {
+    public Track saveTrack(Track track) throws TrackAlreadyExistsException {
+        if(trackRepository.findById(track.getTrackId()).isPresent()){
+            throw new TrackAlreadyExistsException();
+        }
         return trackRepository.save(track);
     }
 
     @Override
-    public boolean deleteTrack(int trackId) {
-        if(trackRepository.findById(trackId).isPresent()){
+    public boolean deleteTrack(int trackId) throws TrackNotFoundException {
+        boolean flag = false;
+        if(trackRepository.findById(trackId).isEmpty())
+        {
+            throw new TrackNotFoundException();
+        }
+        else {
             Track track= trackRepository.findById(trackId).get();
             trackRepository.delete(track);
-            return true;
+            flag = true;
         }
-        return false;
+        return flag;
     }
 
     @Override
@@ -43,12 +55,20 @@ public class TrackServiceImpl implements TrackService{
     }
 
     @Override
-    public List<Track> getTrackByRating(int trackRating) {
+    public List<Track> getTrackByRating(int trackRating) throws TrackRatingNotFoundException {
+        if(trackRepository.findByTrackRating(trackRating).isEmpty())
+        {
+            throw new TrackRatingNotFoundException();
+        }
         return trackRepository.findByTrackRating(trackRating);
     }
 
     @Override
-    public List<Track> getTrackByArtist(String trackArtist) {
+    public List<Track> getTrackByArtist(String trackArtist) throws TrackArtistNotFoundException {
+        if(trackRepository.findByTrackArtist(trackArtist).isEmpty())
+        {
+            throw new TrackArtistNotFoundException();
+        }
         return trackRepository.findByTrackArtist(trackArtist);
     }
 }
