@@ -8,6 +8,9 @@ package com.bej.service.controller;
 
 import com.bej.service.domain.Track;
 import com.bej.service.exception.TrackAlreadyExistsException;
+import com.bej.service.exception.TrackArtistNotFoundException;
+import com.bej.service.exception.TrackNotFoundException;
+import com.bej.service.exception.TrackRatingNotFoundException;
 import com.bej.service.service.TrackServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,8 +37,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -89,16 +91,73 @@ public class TrackControllerTest {
     }
 
     @Test
-    public void givenCustomerIdDeleteCustomer() throws Exception {
+    public void givenTrackReturnReturnAllTrackDetailsSuccess() throws Exception {
+        when(trackService.getAllTracks()).thenReturn(trackList);
+        mockMvc.perform(get("/api/v1/tracks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonToString(trackList)))
+                .andExpect(status().isOk()).andDo(MockMvcResultHandlers.print());
+        verify(trackService,times(1)).getAllTracks();
+    }
+
+    @Test
+    public void givenTrackArtistReturnTracksByArtistSuccess() throws Exception {
+        when(trackService.getTrackByArtist(any())).thenReturn(trackList);
+        mockMvc.perform(get("/api/v1/trackbyartist/Justin Bieber")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+        verify(trackService,times(1)).getTrackByArtist(any());
+    }
+
+    @Test
+    public void givenTrackArtistReturnTracksByArtistFailure() throws Exception {
+        when(trackService.getTrackByArtist(any())).thenThrow(TrackArtistNotFoundException.class);
+        mockMvc.perform(get("/api/v1/trackbyartist/Justin Bieber")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andDo(MockMvcResultHandlers.print());
+        verify(trackService,times(1)).getTrackByArtist(any());
+    }
+
+    @Test
+    public void givenTrackRatingReturnTracksGreaterThanRatingSuccess() throws Exception {
+        when(trackService.getTrackByRating(anyInt())).thenReturn(trackList);
+        mockMvc.perform(get("/api/v1/trackbyrating/4")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+        verify(trackService,times(1)).getTrackByRating(anyInt());
+    }
+
+    @Test
+    public void givenTrackRatingReturnTracksGreaterThanRatingFailure() throws Exception {
+        when(trackService.getTrackByRating(anyInt())).thenThrow(TrackRatingNotFoundException.class);
+        mockMvc.perform(get("/api/v1/trackbyrating/4")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andDo(MockMvcResultHandlers.print());
+        verify(trackService,times(1)).getTrackByRating(anyInt());
+    }
+    @Test
+    public void givenCustomerIdDeleteCustomerSuccess() throws Exception {
         when(trackService.deleteTrack(anyInt())).thenReturn(true);
         mockMvc.perform(delete("/api/v1/track/101")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
         verify(trackService,times(1)).deleteTrack(anyInt());
-
     }
 
+    @Test
+    public void givenCustomerIdDeleteCustomerFailure() throws Exception {
+        when(trackService.deleteTrack(anyInt())).thenThrow(TrackNotFoundException.class);
+        mockMvc.perform(delete("/api/v1/track/101")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andDo(MockMvcResultHandlers.print());
+        verify(trackService,times(1)).deleteTrack(anyInt());
+    }
 
     private static String jsonToString(final Object ob) throws JsonProcessingException {
         String result;
@@ -112,6 +171,4 @@ public class TrackControllerTest {
 
         return result;
     }
-
-
 }

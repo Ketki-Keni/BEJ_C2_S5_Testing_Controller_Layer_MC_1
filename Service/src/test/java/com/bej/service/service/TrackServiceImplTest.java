@@ -21,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -100,13 +101,19 @@ public class TrackServiceImplTest {
     }
 
     @Test
+    public void givenTrackRatingReturnAllTracksGreaterThan4() throws TrackRatingNotFoundException {
+        List<Track> list = new ArrayList<>();
+        list.add(track1);
+        when(trackRepository.findByTrackRating(track.getTrackRating())).thenReturn(list);
+        assertEquals(1,trackService.getTrackByRating(4).size());
+    }
+    @Test
     @DisplayName("Test case for deleting Track object")
     public void givenTrackToDeleteShouldDeleteTrack() throws TrackNotFoundException {
         when(trackRepository.findById(track.getTrackId())).thenReturn(Optional.ofNullable(track));
         boolean flag = trackService.deleteTrack(track.getTrackId());
         assertEquals(true,flag);
 
-        verify(trackRepository,times(1)).deleteById(any());
-        verify(trackRepository,times(1)).findById(any());
+        verify(trackRepository,times(1)).delete(any());
     }
 }

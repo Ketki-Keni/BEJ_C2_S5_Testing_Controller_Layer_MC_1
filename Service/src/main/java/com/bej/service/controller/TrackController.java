@@ -48,7 +48,7 @@ public class TrackController {
     //Uri : http://localhost:8082/api/v1/tracks : Method : Get
 
     @GetMapping("/tracks")
-    public ResponseEntity<?> getAllCustomers(){
+    public ResponseEntity<?> getAllTracks(){
         List<Track> allTracks=trackService.getAllTracks();
 
         if(allTracks.size()>0){
